@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Numerology Calculator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Numerology Calculator</h1>
+        <form id="numerologyForm">
+            <div class="form-group">
+                <label for="birthdate">Enter Your Birthdate (YYYY-MM-DD):</label>
+                <input type="date" class="form-control" id="birthdate" name="birthdate" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Calculate</button>
+        </form>
+
+        <div id="result" class="mt-5">
+            <h2>Numerology Predictions</h2>
+            <p><strong>Life Path Number:</strong> <span id="lifePathNumber"></span></p>
+            <p><strong>Planet & Quality:</strong> <span id="lifePathDetails"></span></p>
+            
+            <p><strong>Birth Day Number:</strong> <span id="birthDayNumber"></span></p>
+            <p><strong>Planet & Quality:</strong> <span id="birthDayDetails"></span></p>
+
+            <p><strong>Personal Year Number:</strong> <span id="personalYearNumber"></span></p>
+            <p><strong>Planet & Quality:</strong> <span id="personalYearDetails"></span></p>
+
+            <h3>Lo Shu Grid Interpretation</h3>
+            <p><strong>Lo Shu Grid:</strong> <pre id="loShuGrid"></pre></p>
+            <ul id="loShuPredictions"></ul>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#numerologyForm').on('submit', function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: '/calculate',
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response){
+                        $('#lifePathNumber').text(response['Life Path Number']);
+                        $('#lifePathDetails').text(response['Life Path Details'].planet + ", " + response['Life Path Details'].quality);
+
+                        $('#birthDayNumber').text(response['Birth Day Number']);
+                        $('#birthDayDetails').text(response['Birth Day Details'].planet + ", " + response['Birth Day Details'].quality);
+
+                        $('#personalYearNumber').text(response['Personal Year Number']);
+                        $('#personalYearDetails').text(response['Personal Year Details'].planet + ", " + response['Personal Year Details'].quality);
+
+                        let gridText = JSON.stringify(response['Lo Shu Grid'], null, 2);
+                        $('#loShuGrid').text(gridText);
+
+                        $('#loShuPredictions').empty();
+                        response['Lo Shu Predictions'].forEach(function(prediction){
+                            $('#loShuPredictions').append('<li>' + prediction + '</li>');
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
